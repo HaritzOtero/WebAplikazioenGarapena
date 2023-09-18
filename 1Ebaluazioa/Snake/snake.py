@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 # Configuración
 pygame.init()
@@ -12,15 +13,21 @@ reloj = pygame.time.Clock()
 negro = (0, 0, 0)
 verde = (0, 255, 0)
 rojo = (255, 0, 0)
+amarillo = (255, 255, 0)
 blanco = (255, 255, 255)
 
 # Inicialización de variables
 serpiente = [(100, 50), (90, 50), (80, 50)]
 serpiente_dir = (10, 0)
 comida = (random.randrange(1, ancho // 10) * 10, random.randrange(1, alto // 10) * 10)
+fruta_amarilla = None
 puntuacion = 0
 velocidad = 10  # Velocidad inicial de la serpiente
 contador_puntuacion = 0
+
+# Tiempo para aparición de la fruta amarilla (10 segundos)
+tiempo_aparicion_fruta = 10
+tiempo_ultima_aparicion = time.time()
 
 # Fuente de texto
 fuente = pygame.font.Font(None, 36)
@@ -30,12 +37,22 @@ def dibujar_serpiente(serpiente):
     for segmento in serpiente:
         pygame.draw.rect(pantalla, verde, pygame.Rect(segmento[0], segmento[1], 10, 10))
 
-def dibujar_comida(comida):
-    pygame.draw.rect(pantalla, rojo, pygame.Rect(comida[0], comida[1], 10, 10))
+def dibujar_comida(comida, color):
+    pygame.draw.rect(pantalla, color, pygame.Rect(comida[0], comida[1], 10, 10))
 
 def mostrar_puntuacion(puntuacion):
     texto = fuente.render(f"Puntuación: {puntuacion}", True, blanco)
     pantalla.blit(texto, (10, 10))
+
+# Función para manejar la aparición de la fruta amarilla
+def manejar_fruta_amarilla():
+    global fruta_amarilla, tiempo_ultima_aparicion
+
+    # Verificar si ha pasado el tiempo para la aparición de la fruta amarilla
+    tiempo_actual = time.time()
+    if tiempo_actual - tiempo_ultima_aparicion >= tiempo_aparicion_fruta:
+        fruta_amarilla = (random.randrange(1, ancho // 10) * 10, random.randrange(1, alto // 10) * 10)
+        tiempo_ultima_aparicion = tiempo_actual
 
 # Bucle principal del juego
 while True:
@@ -67,7 +84,12 @@ while True:
 
         # Aumentar la velocidad cada 5 puntos
         if contador_puntuacion % 5 == 0:
-            velocidad += 1
+            velocidad += 2
+
+    # Comprobar si la serpiente ha comido la fruta amarilla
+    if fruta_amarilla and serpiente[0] == fruta_amarilla:
+        puntuacion += 5
+        fruta_amarilla = None
 
     else:
         serpiente.pop()
@@ -86,9 +108,12 @@ while True:
     # Limpiar pantalla
     pantalla.fill(negro)
 
-    # Dibujar la serpiente y la comida
+    # Dibujar la serpiente, la comida y la fruta amarilla
     dibujar_serpiente(serpiente)
-    dibujar_comida(comida)
+    dibujar_comida(comida, rojo)
+    manejar_fruta_amarilla()
+    if fruta_amarilla:
+        dibujar_comida(fruta_amarilla, amarillo)
 
     # Mostrar la puntuación
     mostrar_puntuacion(puntuacion)
