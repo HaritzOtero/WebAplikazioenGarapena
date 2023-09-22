@@ -53,8 +53,9 @@ def mostrar_puntuacion(puntuacion):
     pantalla.blit(texto, (10, 10))
 
 def mostrar_puntuacion_maxima(puntuacion_maxima):
-    texto = fuente.render(f"Puntuación Máxima: {puntuacion_maxima}", True, blanco)
-    pantalla.blit(texto, (10, 50))
+    texto_maxima = fuente.render(f"Puntuación Máxima: {puntuacion_maxima}", True, blanco)
+    x_maxima = ancho - texto_maxima.get_width() - 10  # Posición a la derecha
+    pantalla.blit(texto_maxima, (x_maxima, 10))
 
 def guardar_puntuacion_maxima(puntuacion):
     global puntuacion_maxima
@@ -167,10 +168,14 @@ while True:
 
         # Controlar la velocidad del juego
         reloj.tick(velocidad)
+   # En el bucle principal, ajusta la posición del mensaje del menú de inicio:
     else:
         # Menú de inicio
         pantalla.fill(negro)
         mensaje = fuente.render("Presiona cualquier tecla para empezar", True, blanco)
-        pantalla.blit(mensaje, (ancho // 2 - mensaje.get_width() // 2, alto // 2 - mensaje.get_height() // 2))
+        x_mensaje = ancho // 2 - mensaje.get_width() // 2
+        y_mensaje = alto // 2 - mensaje.get_height() // 2
+        pantalla.blit(mensaje, (x_mensaje, y_mensaje))
+        mostrar_puntuacion(puntuacion)
         mostrar_puntuacion_maxima(puntuacion_maxima)
         pygame.display.flip()
